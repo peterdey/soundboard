@@ -1,17 +1,16 @@
 package de.meonwax.soundboard.util;
 
 import android.content.Context;
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,25 +123,17 @@ public class FileUtils {
 
     /**
      * Get all available storage directories.
-     * Inspired by CyanogenMod File Manager:
-     * https://github.com/CyanogenMod/android_packages_apps_CMFileManager
      */
     public static Set<File> getStorageDirectories(Context context) {
         if (storageDirectories == null) {
-            try {
-                // Use reflection to retrieve storage volumes because required classes and methods are hidden in AOSP.
-                StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
-                Method method = storageManager.getClass().getMethod("getVolumeList");
-                StorageVolume[] storageVolumes = (StorageVolume[]) method.invoke(storageManager);
-                if (storageVolumes != null && storageVolumes.length > 0) {
-                    storageDirectories = new HashSet<>();
-                    for (StorageVolume volume : storageVolumes) {
-                        storageDirectories.add(new File(volume.getPath()));
-                    }
+            storageDirectories = new HashSet<>();
+            File[] externalFilesDirs = ContextCompat.getExternalFilesDirs(context, null);
+            for (File file : externalFilesDirs) {
+                if (file != null) {
+                    // Go up to the root of the storage volume
+                    File root = file.getParentFile().getParentFile().getParentFile().getParentFile();
+                    storageDirectories.add(root);
                 }
-
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage());
             }
         }
         return storageDirectories;
