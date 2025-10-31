@@ -86,10 +86,17 @@ public class MainActivity extends AppCompatActivity {
 
     @TargetApi(Build.VERSION_CODES.M)
     private void checkForPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        String permission;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permission = Manifest.permission.READ_MEDIA_AUDIO;
+        } else {
+            permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        }
+
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             if (!hasRequestedPermissions) {
                 hasRequestedPermissions = true;
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
+                ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_CODE_ASK_PERMISSIONS);
             }
         }
     }
@@ -100,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CODE_ASK_PERMISSIONS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Workaround for bug
-                    // https://code.google.com/p/android-developer-preview/issues/detail?id=2982
-                    android.os.Process.killProcess(android.os.Process.myPid());
+                    // Permission was granted. The app will now be able to read audio files.
+                    // We can re-initialize or refresh the view if needed.
+                    init();
                 } else {
                     new AlertDialog.Builder(this)
                             .setMessage(Html.fromHtml(getString(R.string.error_permission_denied, getString(R.string.app_name))))
