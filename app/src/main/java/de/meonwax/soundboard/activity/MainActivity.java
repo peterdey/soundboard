@@ -129,21 +129,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_new:
-                DialogFragment filePickerFragment = new FilePickerDialogFragment();
-                filePickerFragment.show(getSupportFragmentManager(), "filePicker");
-                break;
-            case R.id.action_remove_all:
-                removeAll();
-                break;
-            case R.id.action_info:
-                Intent intent = new Intent(this, AboutActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.action_exit:
-                finish();
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_new) {
+            DialogFragment filePickerFragment = new FilePickerDialogFragment();
+            filePickerFragment.show(getSupportFragmentManager(), "filePicker");
+        } else if (itemId == R.id.action_remove_all) {
+            removeAll();
+        } else if (itemId == R.id.action_info) {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.action_exit) {
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
