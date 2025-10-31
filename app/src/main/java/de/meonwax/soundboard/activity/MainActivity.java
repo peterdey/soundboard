@@ -8,13 +8,13 @@ import android.content.pm.PackageManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -129,21 +129,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_new:
-                DialogFragment filePickerFragment = new FilePickerDialogFragment();
-                filePickerFragment.show(getSupportFragmentManager(), "filePicker");
-                break;
-            case R.id.action_remove_all:
-                removeAll();
-                break;
-            case R.id.action_info:
-                Intent intent = new Intent(this, AboutActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.action_exit:
-                finish();
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_new) {
+            DialogFragment filePickerFragment = new FilePickerDialogFragment();
+            filePickerFragment.show(getSupportFragmentManager(), "filePicker");
+        } else if (itemId == R.id.action_remove_all) {
+            removeAll();
+        } else if (itemId == R.id.action_info) {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.action_exit) {
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

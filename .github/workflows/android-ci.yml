@@ -17,11 +17,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew assembleDebug
+
+      - name: Rename Debug APK
+        id: rename_apk
+        run: |
+          SHORT_HASH=$(git rev-parse --short HEAD)
+          NEW_NAME="de.meonwax.soundboard-${SHORT_HASH}.apk"
+          mv app/build/outputs/apk/debug/app-debug.apk "${NEW_NAME}"
+          echo "apk_name=${NEW_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.rename_apk.outputs.apk_name }}
+          path: ${{ steps.rename_apk.outputs.apk_name }}
 
   publish:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -68,5 +82,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./app/build/outputs/apk/release/app-release.apk
-          asset_name: soundboard.apk
+          asset_name: de.meonwax.soundboard-${{ github.ref_name }}.apk
           asset_content_type: application/vnd.android.package-archive
