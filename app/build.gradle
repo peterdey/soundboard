@@ -13,7 +13,7 @@ def getVersionCode = {
 def getVersionName = {
     def stdout = new ByteArrayOutputStream()
     project.exec {
-        commandLine 'sh', '-c', "git describe --tags --always | sed 's/-\\([0-9]\\+\\)-g/-/'"
+        commandLine 'sh', '-c', "git describe --tags --always | sed 's/-\\([0-9]\\+\\)-g/\\-/'"
         standardOutput = stdout
     }
     def versionName = stdout.toString().trim()
