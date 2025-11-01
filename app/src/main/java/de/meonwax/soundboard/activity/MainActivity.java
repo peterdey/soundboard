@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private SoundPool soundPool;
     private List<Sound> sounds;
     private SoundAdapter soundAdapter;
+    private boolean editMode = false;
+    private MenuItem editMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        editMenuItem = menu.findItem(R.id.action_edit);
         return true;
     }
 
@@ -140,8 +143,10 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.action_new) {
             DialogFragment filePickerFragment = new FilePickerDialogFragment();
             filePickerFragment.show(getSupportFragmentManager(), "filePicker");
-        } else if (itemId == R.id.action_remove_all) {
-            removeAll();
+        } else if (itemId == R.id.action_edit) {
+            editMode = !editMode;
+            soundAdapter.setShowDeleteButtons(editMode);
+            editMenuItem.setIcon(editMode ? R.drawable.ic_check_24dp : R.drawable.ic_edit_24dp);
         } else if (itemId == R.id.action_info) {
             Intent intent = new Intent(this, AboutActivity.class);
             startActivity(intent);
@@ -198,21 +203,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void playSound(int soundId) {
         soundPool.play(soundId, 1f, 1f, 1, 0, 1);
-    }
-
-    private void removeAll() {
-        new AlertDialog.Builder(this)
-                .setMessage(Html.fromHtml(getString(R.string.confirm_remove_all)))
-                .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        for (int i = sounds.size() - 1; i >= 0; i--) {
-                            removeSound(i);
-                        }
-                    }
-                })
-                .setNegativeButton(R.string.button_cancel, null)
-                .show();
     }
 
     public void removeSound(int position) {
