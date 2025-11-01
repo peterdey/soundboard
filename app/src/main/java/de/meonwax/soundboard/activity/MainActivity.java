@@ -8,13 +8,13 @@ import android.content.pm.PackageManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,10 +86,17 @@ public class MainActivity extends AppCompatActivity {
 
     @TargetApi(Build.VERSION_CODES.M)
     private void checkForPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        String permission;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permission = Manifest.permission.READ_MEDIA_AUDIO;
+        } else {
+            permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        }
+
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             if (!hasRequestedPermissions) {
                 hasRequestedPermissions = true;
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
+                ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_CODE_ASK_PERMISSIONS);
             }
         }
     }
@@ -100,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CODE_ASK_PERMISSIONS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Workaround for bug
-                    // https://code.google.com/p/android-developer-preview/issues/detail?id=2982
-                    android.os.Process.killProcess(android.os.Process.myPid());
+                    // Permission was granted. The app will now be able to read audio files.
+                    // We can re-initialize or refresh the view if needed.
+                    init();
                 } else {
                     new AlertDialog.Builder(this)
                             .setMessage(Html.fromHtml(getString(R.string.error_permission_denied, getString(R.string.app_name))))
@@ -129,21 +136,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_new:
-                DialogFragment filePickerFragment = new FilePickerDialogFragment();
-                filePickerFragment.show(getSupportFragmentManager(), "filePicker");
-                break;
-            case R.id.action_remove_all:
-                removeAll();
-                break;
-            case R.id.action_info:
-                Intent intent = new Intent(this, AboutActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.action_exit:
-                finish();
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_new) {
+            DialogFragment filePickerFragment = new FilePickerDialogFragment();
+            filePickerFragment.show(getSupportFragmentManager(), "filePicker");
+        } else if (itemId == R.id.action_remove_all) {
+            removeAll();
+        } else if (itemId == R.id.action_info) {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.action_exit) {
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
