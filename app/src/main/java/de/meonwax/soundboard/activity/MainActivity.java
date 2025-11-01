@@ -14,11 +14,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -32,6 +34,7 @@ import de.meonwax.soundboard.sound.Sound;
 import de.meonwax.soundboard.sound.SoundAdapter;
 import de.meonwax.soundboard.sound.SoundPoolBuilder;
 import de.meonwax.soundboard.util.FileUtils;
+import de.meonwax.soundboard.helper.SimpleItemTouchHelperCallback;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,8 +68,13 @@ public class MainActivity extends AppCompatActivity {
         // Init sound adapter
         sounds = new ArrayList<>();
         soundAdapter = new SoundAdapter(this, sounds);
-        ListView soundList = (ListView) findViewById(R.id.sound_list);
+        RecyclerView soundList = (RecyclerView) findViewById(R.id.sound_list);
+        soundList.setLayoutManager(new LinearLayoutManager(this));
         soundList.setAdapter(soundAdapter);
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(soundAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(soundList);
 
         // Populate sound files
         List<File> soundFiles = FileUtils.getInternalFiles(this);
@@ -146,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.action_edit) {
             editMode = !editMode;
             soundAdapter.setShowDeleteButtons(editMode);
+            soundAdapter.setEditMode(editMode);
             editMenuItem.setIcon(editMode ? R.drawable.ic_check_24dp : R.drawable.ic_edit_24dp);
         } else if (itemId == R.id.action_info) {
             Intent intent = new Intent(this, AboutActivity.class);

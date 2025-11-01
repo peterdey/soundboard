@@ -2,26 +2,31 @@ package de.meonwax.soundboard.sound;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import java.util.Collections;
 import java.util.List;
 
 import de.meonwax.soundboard.R;
 import de.meonwax.soundboard.activity.MainActivity;
+import de.meonwax.soundboard.helper.ItemTouchHelperAdapter;
+import de.meonwax.soundboard.helper.ItemTouchHelperViewHolder;
 
-public class SoundAdapter extends BaseAdapter {
+public class SoundAdapter extends RecyclerView.Adapter<SoundAdapter.SoundViewHolder> implements ItemTouchHelperAdapter {
 
     private final Context context;
     private final List<Sound> sounds;
     private boolean showDeleteButtons = false;
+    private boolean editMode = false;
 
     public SoundAdapter(Context context, List<Sound> sounds) {
         this.context = context;
@@ -33,42 +38,33 @@ public class SoundAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    @Override
-    public int getCount() {
-        return sounds.size();
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+        notifyDataSetChanged();
     }
 
     @Override
-    public Sound getItem(int position) {
-        return sounds.get(position);
+    public SoundViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.sound_row, parent, false);
+        return new SoundViewHolder(view);
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    public void onBindViewHolder(final SoundViewHolder holder, int position) {
+        final Sound sound = sounds.get(position);
 
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.sound_row, parent, false);
-        }
-
-        final Sound sound = getItem(position);
-
-        Button playButton = (Button) convertView.findViewById(R.id.sound_play);
-        playButton.setText(sound.getName());
-        playButton.setOnClickListener(new OnClickListener() {
+        holder.playButton.setText(sound.getName());
+        holder.playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) context).playSound(sound.getId());
+                if (!editMode) {
+                    ((MainActivity) context).playSound(sound.getId());
+                }
             }
         });
 
-        ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.sound_delete);
-        deleteButton.setVisibility(showDeleteButtons ? View.VISIBLE : View.GONE);
-        deleteButton.setOnClickListener(new OnClickListener() {
+        holder.deleteButton.setVisibility(showDeleteButtons ? View.VISIBLE : View.GONE);
+        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(context)
@@ -76,14 +72,52 @@ public class SoundAdapter extends BaseAdapter {
                         .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ((MainActivity) context).removeSound(position);
+                                ((MainActivity) context).removeSound(holder.getAdapterPosition());
                             }
                         })
                         .setNegativeButton(R.string.button_cancel, null)
                         .show();
             }
         });
+    }
 
-        return convertView;
+    @Override
+    public int getItemCount() {
+        return sounds.size();
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        Sound movedSound = sounds.remove(fromPosition);
+        sounds.add(toPosition, movedSound);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        sounds.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public class SoundViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
+        public Button playButton;
+        public ImageButton deleteButton;
+
+        public SoundViewHolder(View itemView) {
+            super(itemView);
+            playButton = (Button) itemView.findViewById(R.id.sound_play);
+            deleteButton = (ImageButton) itemView.findViewById(R.id.sound_delete);
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
+        }
     }
 }
