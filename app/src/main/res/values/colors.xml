@@ -2,5 +2,4 @@
 <resources>
     <color name="ColorPrimary">#FFC107</color>
     <color name="ColorPrimaryDark">#FFA000</color>
-    <color name="background_material_light">#fafafa</color>
 </resources>

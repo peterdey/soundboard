@@ -34,6 +34,7 @@ import de.meonwax.soundboard.sound.Sound;
 import de.meonwax.soundboard.sound.SoundAdapter;
 import de.meonwax.soundboard.sound.SoundPoolBuilder;
 import de.meonwax.soundboard.util.FileUtils;
+import de.meonwax.soundboard.helper.SimpleItemTouchHelperCallback;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,44 +72,7 @@ public class MainActivity extends AppCompatActivity {
         soundList.setLayoutManager(new LinearLayoutManager(this));
         soundList.setAdapter(soundAdapter);
 
-        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
-            @Override
-            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0);
-            }
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                soundAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-                return true;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            }
-
-            @Override
-            public boolean isLongPressDragEnabled() {
-                return editMode;
-            }
-
-            @Override
-            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-                super.onSelectedChanged(viewHolder, actionState);
-                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder != null) {
-                    final float elevation = 8f * getResources().getDisplayMetrics().density;
-                    viewHolder.itemView.setElevation(elevation);
-                }
-            }
-
-            @Override
-            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                super.clearView(recyclerView, viewHolder);
-                if (viewHolder != null) {
-                    viewHolder.itemView.setElevation(0);
-                }
-            }
-        };
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(soundAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(soundList);
 

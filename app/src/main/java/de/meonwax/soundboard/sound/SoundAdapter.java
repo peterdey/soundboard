@@ -2,6 +2,8 @@ package de.meonwax.soundboard.sound;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
@@ -16,8 +18,10 @@ import java.util.List;
 
 import de.meonwax.soundboard.R;
 import de.meonwax.soundboard.activity.MainActivity;
+import de.meonwax.soundboard.helper.ItemTouchHelperAdapter;
+import de.meonwax.soundboard.helper.ItemTouchHelperViewHolder;
 
-public class SoundAdapter extends RecyclerView.Adapter<SoundAdapter.SoundViewHolder> {
+public class SoundAdapter extends RecyclerView.Adapter<SoundAdapter.SoundViewHolder> implements ItemTouchHelperAdapter {
 
     private final Context context;
     private final List<Sound> sounds;
@@ -82,13 +86,21 @@ public class SoundAdapter extends RecyclerView.Adapter<SoundAdapter.SoundViewHol
         return sounds.size();
     }
 
-    public void onItemMove(int fromPosition, int toPosition) {
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
         Sound movedSound = sounds.remove(fromPosition);
         sounds.add(toPosition, movedSound);
         notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 
-    public class SoundViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public void onItemDismiss(int position) {
+        sounds.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public class SoundViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         public Button playButton;
         public ImageButton deleteButton;
 
@@ -96,6 +108,16 @@ public class SoundAdapter extends RecyclerView.Adapter<SoundAdapter.SoundViewHol
             super(itemView);
             playButton = (Button) itemView.findViewById(R.id.sound_play);
             deleteButton = (ImageButton) itemView.findViewById(R.id.sound_delete);
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
         }
     }
 }
