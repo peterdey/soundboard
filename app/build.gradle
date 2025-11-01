@@ -1,6 +1,28 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
+def getVersionCode = {
+    def stdout = new ByteArrayOutputStream()
+    project.exec {
+        commandLine 'git', 'rev-list', '--count', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim().toInteger()
+}
+
+def getVersionName = {
+    def stdout = new ByteArrayOutputStream()
+    project.exec {
+        commandLine 'sh', '-c', "git describe --tags --always | sed 's/-\\([0-9]\\+\\)-g/\\-/'"
+        standardOutput = stdout
+    }
+    def versionName = stdout.toString().trim()
+    if (versionName.startsWith("v")) {
+        return versionName.substring(1)
+    }
+    return versionName
+}
+
 android {
     namespace "de.meonwax.soundboard"
     compileSdkVersion 34
@@ -9,8 +31,8 @@ android {
         applicationId "de.meonwax.soundboard"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 4
-        versionName "0.9.3"
+        versionCode getVersionCode()
+        versionName getVersionName()
     }
     signingConfigs {
         release {
