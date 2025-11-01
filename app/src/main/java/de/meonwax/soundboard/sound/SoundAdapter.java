@@ -21,10 +21,16 @@ public class SoundAdapter extends BaseAdapter {
 
     private final Context context;
     private final List<Sound> sounds;
+    private boolean showDeleteButtons = false;
 
     public SoundAdapter(Context context, List<Sound> sounds) {
         this.context = context;
         this.sounds = sounds;
+    }
+
+    public void setShowDeleteButtons(boolean show) {
+        this.showDeleteButtons = show;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -61,6 +67,7 @@ public class SoundAdapter extends BaseAdapter {
         });
 
         ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.sound_delete);
+        deleteButton.setVisibility(showDeleteButtons ? View.VISIBLE : View.GONE);
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
