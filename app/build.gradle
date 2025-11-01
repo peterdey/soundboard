@@ -1,18 +1,18 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
-def getVersionCode = { ->
+def getVersionCode = {
     def stdout = new ByteArrayOutputStream()
-    exec {
+    project.exec {
         commandLine 'git', 'rev-list', '--count', 'HEAD'
         standardOutput = stdout
     }
     return stdout.toString().trim().toInteger()
 }
 
-def getVersionName = { ->
+def getVersionName = {
     def stdout = new ByteArrayOutputStream()
-    exec {
+    project.exec {
         commandLine 'sh', '-c', "git describe --tags --always | sed 's/-\\([0-9]\\+\\)-g/-/'"
         standardOutput = stdout
     }
