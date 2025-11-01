@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
                 if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder != null) {
                     final float elevation = 8f * getResources().getDisplayMetrics().density;
                     viewHolder.itemView.setElevation(elevation);
-                    viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.background_material_light));
                 }
             }
 
@@ -107,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
                 super.clearView(recyclerView, viewHolder);
                 if (viewHolder != null) {
                     viewHolder.itemView.setElevation(0);
-                    viewHolder.itemView.setBackgroundResource(R.drawable.item_selector);
                 }
             }
         };
