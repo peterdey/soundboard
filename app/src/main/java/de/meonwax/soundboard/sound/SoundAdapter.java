@@ -83,15 +83,8 @@ public class SoundAdapter extends RecyclerView.Adapter<SoundAdapter.SoundViewHol
     }
 
     public void onItemMove(int fromPosition, int toPosition) {
-        if (fromPosition < toPosition) {
-            for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(sounds, i, i + 1);
-            }
-        } else {
-            for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(sounds, i, i - 1);
-            }
-        }
+        Sound movedSound = sounds.remove(fromPosition);
+        sounds.add(toPosition, movedSound);
         notifyItemMoved(fromPosition, toPosition);
     }
 

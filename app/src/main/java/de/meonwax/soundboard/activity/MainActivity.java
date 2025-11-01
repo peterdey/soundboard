@@ -91,6 +91,24 @@ public class MainActivity extends AppCompatActivity {
             public boolean isLongPressDragEnabled() {
                 return editMode;
             }
+
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    if (viewHolder != null) {
+                        viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, android.R.color.holo_blue_light));
+                    }
+                }
+            }
+
+            @Override
+            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                if (viewHolder != null) {
+                    viewHolder.itemView.setBackgroundResource(android.R.drawable.list_selector_background);
+                }
+            }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(soundList);
