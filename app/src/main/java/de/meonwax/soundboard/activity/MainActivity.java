@@ -95,10 +95,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
                 super.onSelectedChanged(viewHolder, actionState);
-                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-                    if (viewHolder != null) {
-                        viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, android.R.color.holo_blue_light));
-                    }
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder != null) {
+                    final float elevation = 8f * getResources().getDisplayMetrics().density;
+                    viewHolder.itemView.setElevation(elevation);
+                    viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.background_material_light));
                 }
             }
 
@@ -106,7 +106,8 @@ public class MainActivity extends AppCompatActivity {
             public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 super.clearView(recyclerView, viewHolder);
                 if (viewHolder != null) {
-                    viewHolder.itemView.setBackgroundResource(android.R.drawable.list_selector_background);
+                    viewHolder.itemView.setElevation(0);
+                    viewHolder.itemView.setBackgroundResource(R.drawable.item_selector);
                 }
             }
         };
